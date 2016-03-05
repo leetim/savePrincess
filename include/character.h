@@ -1,16 +1,16 @@
 #pragma once
 #include <game_map.h>
 #include <vector>
-#define HP_KNIGHT 2000
-#define HP_PRINCESS 1000
-#define HP_ZOMBIE 250
-#define HP_DRAGON 600
-#define DMG_KNIGHT 100
+#define HP_KNIGHT 10000
+#define HP_PRINCESS 5000
+#define HP_ZOMBIE 900
+#define HP_DRAGON 5000
+#define DMG_KNIGHT 700
 #define DMG_PRINCESS 0
-#define DMG_ZOMBIE 150
-#define DMG_DRAGON 300
+#define DMG_ZOMBIE 450
+#define DMG_DRAGON 800
 
-#define ZOMBIE_COUNT 7
+#define ZOMBIE_COUNT 20
 
 class Character{
 public:
@@ -18,6 +18,7 @@ public:
 	int getDamage();
 	void makeDamage(int dmg);
 	point coord();
+	virtual ~Character();
 	virtual void move() = 0;
 protected:
 	PGameMap myMap;

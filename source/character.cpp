@@ -11,6 +11,17 @@ using namespace std;
 extern vector<PCharacter> monsters;
 extern PCharacter player;
 extern PCharacter princess;
+
+//Процедуры
+PCharacter find_monster(const point& p){
+	for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
+		if ((*i)->coord() == p){
+			return *i;
+		}
+	}
+	return NULL;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Character
 //Возвращает значение HP
@@ -28,12 +39,19 @@ void Character::makeDamage(int dmg){
 	hp -= dmg;
 	if (hp <= 0){
 		myMap->setCharacter(CHR_NOTHING, x, y);
+		x = -1;
+		y = -1;
 	}
 }
 
 //Ввозвращает координаты персонажа
 point Character::coord(){
 	return point(x, y);
+}
+
+//Деструктор
+Character::~Character(){
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -92,20 +110,21 @@ void Knight::move(){
 		return;
 	}
 	if (myMap->getCell(np) == CHR_NOTHING || myMap->getCell(np) == CHR_PRINCESS){
+		if (myMap->getCell(np) == CHR_PRINCESS){
+			myMap->setCharacter(CHR_NOTHING, np.x, np.y);
+		}
 		myMap->moveCharacter(np.x, np.y, p.x, p.y);
 		x = np.x;
 		y = np.y;
 		return;
 	}
-	for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
-		if ((*i)->coord() == np){
-			(*i)->makeDamage(damage);
-			if ((*i)->hitPoint() <= 0){
-				myMap->moveCharacter(np.x, np.y, p.x, p.y);
-				x = np.x;
-				y = np.y;
-			}
-			break;
+	PCharacter target = find_monster(np);
+	if (target != NULL){
+		target->makeDamage(damage);
+		if (target->hitPoint() <= 0){
+			myMap->moveCharacter(np.x, np.y, p.x, p.y);
+			x = np.x;
+			y = np.y;
 		}
 	}
 }
@@ -120,6 +139,15 @@ void Monster::move(){
 	int dir = rand() % 4;
 	point p = point(x, y);
 	point np;
+	point a[4] = {UP_POINT, LEFT_POINT, RIGHT_POINT, DOWN_POINT};
+	for (int i = 0; i < 4; i++){
+		cell t = myMap->getCell(p + a[i]);
+		if (t == CHR_KNIGHT){
+			dir = -1;
+			np = p + a[i];
+			break;
+		}
+	}
 	switch(dir){
 		case UP_CODE:
 			np = p + UP_POINT;
@@ -141,11 +169,14 @@ void Monster::move(){
 		y = np.y;
 		return;
 	}
-	if (c == CHR_KNIGHT){
-		player->makeDamage(damage);
-	}
-	if (c == CHR_PRINCESS){
-		princess->makeDamage(damage);
+	PCharacter target = find_monster(np);
+	if (target != NULL){
+		target->makeDamage(damage);
+		if (target->hitPoint() <= 0){
+			myMap->moveCharacter(np.x, np.y, p.x, p.y);
+			x = np.x;
+			y = np.y;
+		}
 	}
 }
 

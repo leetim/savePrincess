@@ -7,10 +7,10 @@
 #define CHR_ZOMBIE 'Z'
 #define CHR_DRAGON 'D'
 
-#define UP_POINT point(0, -1);
-#define DOWN_POINT point(0, 1);
-#define RIGHT_POINT point(1, 0);
-#define LEFT_POINT point(-1, 0);
+#define UP_POINT point(0, -1)
+#define DOWN_POINT point(0, 1)
+#define RIGHT_POINT point(1, 0)
+#define LEFT_POINT point(-1, 0)
 
 #define UP_CODE 0
 #define RIGHT_CODE 1
