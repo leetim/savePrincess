@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 
 project(savePrincess)
 
-set(SOURCE_EXECUTABLE ./source/main.cpp)
+include_directories(./include)
 
-add_executable(main ${SOURCE_EXECUTABLE})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
+set(SOURCE_EXECUTABLE ./source/main.cpp)
+set(CHARACTER_SOURCE ./source/character.cpp)
+set(GAMEMAP_SOURCE ./source/game_map.cpp)
+
+add_executable(main ${SOURCE_EXECUTABLE} ${CHARACTER_SOURCE} ${GAMEMAP_SOURCE})
