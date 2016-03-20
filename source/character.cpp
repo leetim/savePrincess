@@ -13,7 +13,7 @@ extern PCharacter player;
 extern PCharacter princess;
 
 //Процедуры
-PCharacter find_monster(const point& p){
+PCharacter find_monster(const Point& p){
 	for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
 		if ((*i)->coord() == p){
 			return *i;
@@ -45,8 +45,8 @@ void Character::makeDamage(int dmg){
 }
 
 //Ввозвращает координаты персонажа
-point Character::coord(){
-	return point(x, y);
+Point Character::coord(){
+	return Point(x, y);
 }
 
 //Деструктор
@@ -59,7 +59,7 @@ Character::~Character(){
 //Стандартный конструктор для принцессы
 Princess::Princess(PGameMap m){
 	myMap = m;
-	point p = myMap->princessCoord();
+	Point p = myMap->princessCoord();
 	x = p.x;
 	y = p.y;
 	hp = HP_PRINCESS;
@@ -75,7 +75,7 @@ void Princess::move(){
 //Стандартный конструктор
 Knight::Knight(PGameMap m){
 	myMap = m;
-	point p = myMap->playerCoord();
+	Point p = myMap->playerCoord();
 	x = p.x;
 	y = p.y;
 	hp = HP_KNIGHT;
@@ -86,8 +86,8 @@ Knight::Knight(PGameMap m){
 void Knight::move(){
 	char comand[15];
 	cin >> comand;
-	point p = point(x, y);
-	point np;
+	Point p = Point(x, y);
+	Point np;
 	switch (comand[0]){
 		case UP:
 			np = p + UP_POINT;
@@ -137,9 +137,9 @@ void Monster::move(){
 		return;
 	}
 	int dir = rand() % 4;
-	point p = point(x, y);
-	point np;
-	point a[4] = {UP_POINT, LEFT_POINT, RIGHT_POINT, DOWN_POINT};
+	Point p = Point(x, y);
+	Point np;
+	Point a[4] = {UP_POINT, LEFT_POINT, RIGHT_POINT, DOWN_POINT};
 	for (int i = 0; i < 4; i++){
 		cell t = myMap->getCell(p + a[i]);
 		if (t == CHR_KNIGHT){
@@ -185,7 +185,7 @@ void Monster::move(){
 
 Zombie::Zombie(PGameMap m){
 	myMap = m;
-	point p = random_point();
+	Point p = random_point();
 	while (myMap->getCell(p) != CHR_NOTHING){
 		p = random_point();
 	}
@@ -201,7 +201,7 @@ Zombie::Zombie(PGameMap m){
 
 Dragon::Dragon(PGameMap m){
 	myMap = m;
-	point p = myMap->dragonCoord();
+	Point p = myMap->dragonCoord();
 	x = p.x;
 	y = p.y;
 	damage = DMG_DRAGON;

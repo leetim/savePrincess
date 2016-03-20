@@ -6,50 +6,21 @@
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-//point
-//Конструктор по умолчанию
-point::point(){
-	x = 0;
-	y = 0;
-}
-
-//Конструктор по 2-м координатам
-point::point(int _x, int _y){
-	x = _x;
-	y = _y;
-}
-
-//Оператор +
-point operator+(const point& f, const point& s){
-	return point(f.x + s.x, f.y + s.y);
-}
-
-//Оператор ==
-bool operator==(const point& f, const point& s){
-	return (f.x == s.x) && (f.y == s.y);
-}
-
-//Генерация случайной точки
-point random_point(){
-	int a = rand() % (MAP_SIZE*MAP_SIZE);
-	return point(a / MAP_SIZE, a % MAP_SIZE);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////
 //GameMap
 //Стандартный конструктор
 GameMap::GameMap(){
-	for (int i = 0; i < MAP_SIZE; i++){
-		for (int j = 0; j < MAP_SIZE; j++){
-			m[i][j] = CHR_NOTHING;
-		}
-	}
-	point p = random_point();
-	setCharacter(CHR_DRAGON, p.x, p.y);
-	p = random_point();
-	setCharacter(CHR_KNIGHT, p.x, p.y);
-	p = random_point();
-	setCharacter(CHR_PRINCESS, p.x, p.y);
+	makeRandomRooms(m);
+	// for (int i = 0; i < MAP_SIZE; i++){
+	// 	for (int j = 0; j < MAP_SIZE; j++){
+	// 		m[i][j] = CHR_NOTHING;
+	// 	}
+	// }
+	// Point p = random_point();
+	// setCharacter(CHR_DRAGON, p.x, p.y);
+	// p = random_point();
+	// setCharacter(CHR_KNIGHT, p.x, p.y);
+	// p = random_point();
+	// setCharacter(CHR_PRINCESS, p.x, p.y);
 }
 
 //Конструктор из файла с картой
@@ -80,20 +51,20 @@ void GameMap::reDraw(){
 }
 
 //Получение символа из ячейки
-cell GameMap::getCell(const point& p){
+cell GameMap::getCell(const Point& p){
 	return m[p.y][p.x];
 }
 
 //Получает координаты символа линейным поиском(стоит использовать только для уникальных символов)
-point GameMap::getCoord(const char& c){
+Point GameMap::getCoord(const char& c){
 	for (int i = 0; i < MAP_SIZE; i++){
 		for(int j = 0; j < MAP_SIZE; j++){
 			if (m[j][i] == c){
-				return point(i, j);
+				return Point(i, j);
 			}
 		}
 	}
-	point p = random_point();
+	Point p = random_point();
 	while (m[p.y][p.x] != '.'){
 		p = random_point();
 	}
@@ -102,16 +73,16 @@ point GameMap::getCoord(const char& c){
 }
 
 //Получает координаты символа 'D' на момент написания коментария обозначающий дракона
-point GameMap::dragonCoord(){
+Point GameMap::dragonCoord(){
 	return getCoord(CHR_DRAGON);
 }
 
 //Получает координаты символа 'K' на момент написания коментария обозначающий рыцаря
-point GameMap::playerCoord(){
+Point GameMap::playerCoord(){
 	return getCoord(CHR_KNIGHT);
 }
 
 //Получает координаты символа 'P' на момент написания коментария обозначающий принцессу
-point GameMap::princessCoord(){
+Point GameMap::princessCoord(){
 	return getCoord(CHR_PRINCESS);
 }
