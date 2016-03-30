@@ -9,22 +9,25 @@ using namespace std;
 //GameMap
 //Стандартный конструктор
 GameMap::GameMap(){
-	makeRandomRooms(m);
-	// for (int i = 0; i < MAP_SIZE; i++){
-	// 	for (int j = 0; j < MAP_SIZE; j++){
-	// 		m[i][j] = CHR_NOTHING;
-	// 	}
-	// }
-	// Point p = random_point();
-	// setCharacter(CHR_DRAGON, p.x, p.y);
-	// p = random_point();
-	// setCharacter(CHR_KNIGHT, p.x, p.y);
-	// p = random_point();
-	// setCharacter(CHR_PRINCESS, p.x, p.y);
+	get_array(m, MAP_SIZE, MAP_SIZE + 1);
+	nx = MAP_SIZE;
+	ny = MAP_SIZE + 1;
+	makeRandomRooms(m, MAP_SIZE, MAP_SIZE + 1);
+}
+
+
+GameMap::GameMap(int _n, int _m){
+	get_array(m, _n, _m + 1);
+	nx = _m;
+	ny = _n;
+	makeRandomRooms(m, _n, _m + 1);
 }
 
 //Конструктор из файла с картой
 GameMap::GameMap(const char file[]){
+	get_array(m, MAP_SIZE, MAP_SIZE + 1);
+	nx = MAP_SIZE;
+	ny = MAP_SIZE + 1;
 	ifstream input(file);
 	for (int i = 0; i < MAP_SIZE; i++){
 		input >> m[i];
@@ -44,10 +47,21 @@ void GameMap::moveCharacter(int x1, int y1, int x2, int y2){
 
 //Выводит карту на экран(желательно предворительно его почистить)
 void GameMap::reDraw(){
-	system("clear");
-	for (int i = 0; i < MAP_SIZE; i++){
-		cout << m[i] << endl;
+	//system("clear");
+	for (int x = 0; x < nx; x++){
+		for (int y = 0; y < ny; y++){
+			move(y + 2, x);
+			if (m[y][x] == CHR_KNIGHT){
+				addch(m[y][x] | COLOR_PAIR(1));
+			}
+			if (m[y][x] == CHR_PRINCESS){
+				addch(m[y][x] | COLOR_PAIR(2));
+			}
+			addch(m[y][x]);
+		}
 	}
+	move(2, 0);
+	refresh();
 }
 
 //Получение символа из ячейки
@@ -55,18 +69,11 @@ cell GameMap::getCell(const Point& p){
 	return m[p.y][p.x];
 }
 
-//Получает координаты символа линейным поиском(стоит использовать только для уникальных символов)
+//Получает координаты символа линейным поиском
 Point GameMap::getCoord(const char& c){
-	for (int i = 0; i < MAP_SIZE; i++){
-		for(int j = 0; j < MAP_SIZE; j++){
-			if (m[j][i] == c){
-				return Point(i, j);
-			}
-		}
-	}
-	Point p = random_point();
+	Point p = random_point(ny, nx);
 	while (m[p.y][p.x] != '.'){
-		p = random_point();
+		p = random_point(ny, nx);
 	}
 	m[p.y][p.x] = c;
 	return p;
@@ -85,4 +92,13 @@ Point GameMap::playerCoord(){
 //Получает координаты символа 'P' на момент написания коментария обозначающий принцессу
 Point GameMap::princessCoord(){
 	return getCoord(CHR_PRINCESS);
+}
+
+//Получает координаты символа 'Z' на момент написания коментария обозначающий зомби
+Point GameMap::zombieCoord(){
+	return getCoord(CHR_ZOMBIE);
+}
+
+GameMap::~GameMap(){
+	delete_array(m);
 }

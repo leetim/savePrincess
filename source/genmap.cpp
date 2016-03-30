@@ -43,6 +43,11 @@ Point random_point(){
 	return Point(a / N, a % N);
 }
 
+Point random_point(int n, int m){
+	int a = rand() % (n*m);
+	return Point(a / n, a % n);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //Room
 //Модель комнаты
@@ -51,6 +56,14 @@ Room::Room(){
 	//Отступ 2 клеточки от границ карты
 	leftTop.x = 2 + (rand() % (N - MIN_L - 2));
 	leftTop.y = 2 + (rand() % (N - MIN_L - 2));
+	rightBottom.x = MIN_L + (rand() % (MAX_L)) + leftTop.x;
+	rightBottom.y = MIN_L + (rand() % (MAX_L)) + leftTop.y;
+}
+
+Room::Room(int n, int m){
+	//Отступ 2 клеточки от границ карты
+	leftTop.x = 2 + (rand() % (m - MIN_L - 2));
+	leftTop.y = 2 + (rand() % (n - MIN_L - 2));
 	rightBottom.x = MIN_L + (rand() % (MAX_L)) + leftTop.x;
 	rightBottom.y = MIN_L + (rand() % (MAX_L)) + leftTop.y;
 }
@@ -65,8 +78,13 @@ Room::Room(const Room& r){
 	rightBottom = r.rightBottom;
 }
 
+//Отладочная функция
+void print_p(Point p){
+	cout << p.x << " " << p.y << endl;
+}
+
 //Отрисовка карты в массив a
-void Room::draw(char a[N][N+1]){
+void Room::draw(char** a){
 	for (int x = leftTop.x + 1; x < rightBottom.x; x++){
 		for(int y = leftTop.y + 1; y < rightBottom.y; y++){
 			a[y][x] = '.';
@@ -86,9 +104,9 @@ bool Room::crossing(Room r){
 	return r.point_in(leftTop)||r.point_in(rightBottom)||r.point_in(lb)||r.point_in(rt);
 }
 
-//Проверка можно ли уместить данную комнату на карту размерами NxN
-bool Room::check(){
-	return (rightBottom.x < N - 1)&&(rightBottom.y < N - 1);
+//Проверка можно ли уместить данную комнату на карту размерами n x m
+bool Room::check(int n, int m){
+	return (rightBottom.x < m - 1)&&(rightBottom.y < n - 1);
 }
 
 //Получение центральной точки комнаты
@@ -99,27 +117,20 @@ Point Room::center(){
 }
 
 //подсчет стоимости прохождения через клетку
-static int cost(char myMap[N][N + 1], Point p, Point finish){
+static int cost(char** myMap, Point p, Point finish){
 	int v = (myMap[p.y][p.x] == '.') ? 1 : 1000000000;
 	return v;
 }
 
-static void printMap(char myMap[N][N + 1]){
-	for (int i = 0; i < N; i++){
-		cout << myMap[i] << endl;
-	}
-	cout << endl;
-}
-
 //Поиск пути из p1 в p2 с наименьшей стоимостью и заполнением его точками
-static void search_way(char myMap[N][N + 1], Point p1, Point p2){
-	char ch[N][N];
-	Point start = p1;
+static void search_way(char** myMap, int n, int m, Point p1, Point p2){
+	char** ch;
+	get_array(ch, n, m);
 
 	//Заполнение массива с флагами для посещенных клеток карты нулями
-	Room m(Point(), Point(N-1, N-1));
-	for (int i = 0; i < N; i++){
-		for (int j = 0; j < N; j++){
+	Room map(Point(), Point(m-1, n-1));
+	for (int i = 0; i < n; i++){
+		for (int j = 0; j < m; j++){
 			ch[i][j] = 0;
 		}
 	}
@@ -127,7 +138,6 @@ static void search_way(char myMap[N][N + 1], Point p1, Point p2){
 	//4 направления и их коды для массива с посещениями
 	Point dir[4] = {LEFT_POINT, UP_POINT, RIGHT_POINT, DOWN_POINT};
 	char code[4] = {'>', 'v', '<', '^'};
-
 	//По сути говоря это обычный алгоритм Диекстры на куче
 	priority_queue<pair<int, Point> > q;
 	q.push(make_pair(0, p1));
@@ -158,7 +168,7 @@ static void search_way(char myMap[N][N + 1], Point p1, Point p2){
 		}
 		for (int i = 0; i < 4; i++){
 			Point p = next.second + dir[i];
-			if (!m.point_in(p)){
+			if (!map.point_in(p)){
 				continue;
 			}
 			if (!ch[p.y][p.x]){
@@ -172,25 +182,26 @@ static void search_way(char myMap[N][N + 1], Point p1, Point p2){
 }
 
 //Генерация комнат и связывание их
-void makeRandomRooms(char myMap[N][N + 1]){
+void makeRandomRooms(char** myMap, int n, int m){
 	int bad_try = 0;
 	Room r;
 	vector <Room> a;
-	for (int i = 0; i < N; i++){
-		for (int j = 0; j < N; j++){
+	for (int i = 0; i < n; i++){
+		for (int j = 0; j < m - 1; j++){
 			myMap[i][j] = '#';
 		}
-		myMap[i][N] = '\0';
+		myMap[i][m - 1] = '\0';
 	}
-	// printMap(myMap);
+	m--;
+	////////////////////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//Мы выкидываем комнату на карту и проверяем можем ли мы ее туда поместить
 	//Если не получилось то пробуем заново
 	//После 100 неудачных попыток забрасываем это гнилое дело
 	while (bad_try < 100){
-		r = Room();
-		if (r.check()){
+		r = Room(n, m);
+		if (r.check(n, m)){
 			bool fail = false;
-			for (int i = 0; i < a.size(); i++){
+			for (int i = 0; (unsigned int)i < a.size(); i++){
 				if (r.crossing(a[i])){
 					bad_try++;
 					fail = true;
@@ -209,14 +220,27 @@ void makeRandomRooms(char myMap[N][N + 1]){
 		r.draw(myMap);
 		bad_try = 0;
 	}
-
 	//Поиск пути из 1-й комнаты во все остальные
 	//К сожалению из-за криво написаной Дийкстры квадратичная асимптотика мало того,
 	//Что замедляет работу в несколько 10-ков раз, так еще и дает такой же результат
 	//Если уменьшить стоимость стен то Дийкстра начинает искать какие-то неочевидные пути
 	//К примеру вдоль границ карты
-	for (int i = 1; i < a.size(); i++){
-		search_way(myMap, a[0].center(), a[i].center());
+	for (int i = 1; (unsigned int)i < a.size(); i++){
+		search_way(myMap, n, m, a[0].center(), a[i].center());
 	}
-	// printMap(myMap);
+}
+
+//Выделение памяти под двумерный массив
+void get_array(char**& a, int n, int m){
+	a = new char*[n];
+	char* b = new char[n * m];
+	for (int i = 0; i < n; i++){
+		a[i] = &b[i * m];
+	}
+}
+
+//Удаление двумерного массива 
+void delete_array(char**& a){
+	delete[] a[0];
+	delete[] a;
 }

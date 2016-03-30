@@ -25,8 +25,7 @@ protected:
 	PGameMap myMap;
 	int hp;
 	int damage;
-	int x;
-	int y;
+	Point position;
 };
 
 typedef Character* PCharacter;

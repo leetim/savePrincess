@@ -2,6 +2,7 @@
 #define SQR(x) ((x)*(x))
 
 #define N 50
+#define M 30
 #define MIN_L 5
 #define MAX_L 8
 
@@ -24,16 +25,21 @@ public:
 class Room{
 public:
 	Room();
+	Room(int n, int m);
 	Room(Point tl, Point rb);
 	Room(const Room& r);
-	void draw(char a[N][N+1]);
+	void draw(char** a);
 	bool point_in(Point p);
 	bool crossing(Room r);
-	bool check();
+	bool check(int n, int m);
 	Point center();
 private:
 	Point leftTop;
 	Point rightBottom;
 };
 
-void makeRandomRooms(char myMap[N][N + 1]);
+void makeRandomRooms(char** myMap, int n, int m);
+void get_array(char**& a, int n, int m);
+void delete_array(char**& a);
+Point random_point();
+Point random_point(int n, int m);

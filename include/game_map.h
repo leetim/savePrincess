@@ -1,5 +1,6 @@
 #pragma once
 #include <genmap.h>
+#include <ncurses.h>
 
 #define MAP_SIZE 50
 #define CHR_WALL '#'
@@ -16,11 +17,11 @@
 
 typedef char cell;
 
-Point random_point();
 
 class GameMap{
 public:
 	GameMap();
+	GameMap(int n, int m);
 	GameMap(const char file[]);
 	void setCharacter(cell c, int x, int y);
 	void moveCharacter(int x1, int y1, int x2, int y2);
@@ -29,9 +30,13 @@ public:
 	Point dragonCoord();
 	Point playerCoord();
 	Point princessCoord();
+	Point zombieCoord();
+	~GameMap();
+	int ny;
+	int nx;
 private:
 	Point getCoord(const char& c);
-	cell m[MAP_SIZE][MAP_SIZE + 1];
+	cell** m;
 };
 
 typedef GameMap* PGameMap;

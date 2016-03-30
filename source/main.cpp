@@ -3,6 +3,8 @@
 #include <character.h>
 #include <stdlib.h>
 #include <ctime>
+#include <algorithm>
+// #include <ncurses.h>
 
 using namespace std;
 
@@ -11,27 +13,39 @@ PCharacter player;
 PCharacter princess;
 
 void status(PCharacter ch, int max_hp, const char a[]){
-	cout << a << ": " << (double)ch->hitPoint() / max_hp * 100.0 << "\%" << endl;
+	printw("%s: %g%%", a, (double)ch->hitPoint() / max_hp * 100.0);
 }
 
 int main(){
 	srand(time(0));
 	// GameMap myMap("castle.map");
-	GameMap myMap = GameMap();
+	initscr();
+	int n = getmaxy(stdscr) - 3;
+	int m = getmaxx(stdscr) - 1;
+	int drag_count = max(m * n / 200, DRAGONS_COUNT);
+	int zomb_count = m * n / 25;
+	GameMap myMap = GameMap(n, m);
+	start_color();
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_GREEN, COLOR_BLACK);
+	noecho();
 	player = new Knight(&myMap);
 	princess = new Princess(&myMap);
 	monsters.push_back(player);
 	monsters.push_back(princess);
-	for (int i = 0; i < DRAGONS_COUNT; i++){
+	for (int i = 0; i < drag_count; i++){
 		monsters.push_back(new Dragon(&myMap));
 	}
-	for(int i = 0; i < ZOMBIE_COUNT; i++){
+	for(int i = 0; i < zomb_count; i++){
 		monsters.push_back(new Zombie(&myMap));
 	}
 	bool game = false;
 	while(!game){
+		clear();
 		myMap.reDraw();
+		move(0, 0);
 		status(player, HP_KNIGHT, "Knight");
+		move(1, 0);
 		status(princess, HP_PRINCESS, "Princess");
 		if (player->coord() == princess->coord()){
 			break;
@@ -46,5 +60,43 @@ int main(){
 	for (int i = 0; i < (int)monsters.size(); i++){
 		delete monsters[i];
 	}
+
+	// for (int i = 0; i < 10; i++){
+	// 	for (int j = 0; j < 10; j++){
+	// 		cout << '#';
+	// 	}
+	// 	cout << endl;
+	// }
+	// int x = 1; 
+	// int y = 1;
+	// move(y, x);
+	// addch('K' | COLOR_PAIR(1));
+	// move(11, 11);
+	// printw("Hellow");
+	// bool goo = true;
+	// while (goo){
+	// 	refresh();
+	// 	int ch = getch();
+	// 	move(y, x);
+	// 	addch('#');
+	// 	switch (ch){
+	// 		case (int)'w':
+	// 			y--;
+	// 			break;
+	// 		case (int)'a':
+	// 			x--;
+	// 			break;
+	// 		case (int)'d':
+	// 			x++;
+	// 			break;
+	// 		case (int)'s':
+	// 			y++;
+	// 			break;
+	// 	}
+	// 	move(y, x);
+	// 	addch('K' | COLOR_PAIR(1));
+	// 	move(0, 0);
+	// }
+	endwin();
 	return 0;
 }
