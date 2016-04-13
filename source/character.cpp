@@ -13,9 +13,10 @@ extern PCharacter player;
 extern PCharacter princess;
 
 //Процедуры
-PCharacter find_monster(const Point& p){
+PCharacter colide_all(PCharacter carrent_character, const Point& new_point){
 	for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
-		if ((*i)->coord() == p){
+		if ((*i)->coord() == new_point){
+			(*i)->colide(carrent_character, new_point);
 			return *i;
 		}
 	}
@@ -62,6 +63,11 @@ Princess::Princess(PGameMap m){
 	hp = HP_PRINCESS;
 }
 
+
+void Princess::colide(Character* chr, const Point& new_point){
+	chr->colide(this, new_point);
+}
+
 //Перемещение
 void Princess::move(){
 	return;
@@ -77,10 +83,34 @@ Knight::Knight(PGameMap m){
 	damage = DMG_KNIGHT;
 }
 
+//Столкновения
+void Knight::colide(Character* chr, const Point& new_point){
+	chr->colide(this, new_point);
+}
+
+void Knight::colide(Princess* chr, const Point& new_point){
+	const Point& np = new_point;
+	Point& p = position;
+	myMap->setCharacter(CHR_NOTHING, new_point.x, new_point.y);
+	myMap->moveCharacter(np.x, np.y, p.x, p.y);
+}
+
+void Knight::colide(Monster* chr, const Point& new_point){
+	const Point& np = new_point;
+	Point& p = position;
+	chr->makeDamage(damage);
+	if (chr->hitPoint() <= 0){
+		myMap->moveCharacter(np.x, np.y, p.x, p.y);
+		p = np;
+	}
+}
+
+
 //Перемещение
 void Knight::move(){
 	// char comand[15];
 	// cin >> comand;
+	// cout << "123" << endl;
 	Point &p = position;
 	Point np;
 	switch (getch()){
@@ -112,18 +142,27 @@ void Knight::move(){
 		position = np;
 		return;
 	}
-	PCharacter target = find_monster(np);
-	if (target != NULL){
-		target->makeDamage(damage);
-		if (target->hitPoint() <= 0){
-			myMap->moveCharacter(np.x, np.y, p.x, p.y);
-			position = np;
-		}
-	}
+	PCharacter target = colide_all(this, np);
+	cout << "123" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Monster
+//Столкновения
+void Monster::colide(Character* chr, const Point& new_point){
+	chr->colide(this, new_point);
+}
+
+void Monster::colide(Knight* chr, const Point& new_point){
+	const Point& np = new_point;
+		Point& p = position;
+	chr->makeDamage(damage);
+	if (chr->hitPoint() <= 0){
+		myMap->moveCharacter(np.x, np.y, p.x, p.y);
+		position = np;
+	}	
+}
+
 //перемещение
 void Monster::move(){
 	if (hp <= 0){
@@ -161,14 +200,8 @@ void Monster::move(){
 		position = np;
 		return;
 	}
-	PCharacter target = find_monster(np);
-	if (target != NULL){
-		target->makeDamage(damage);
-		if (target->hitPoint() <= 0){
-			myMap->moveCharacter(np.x, np.y, p.x, p.y);
-			position = np;
-		}
-	}
+	PCharacter target = colide_all(this, np);
+	cout << "123" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

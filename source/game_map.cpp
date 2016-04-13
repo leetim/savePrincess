@@ -51,13 +51,26 @@ void GameMap::reDraw(){
 	for (int x = 0; x < nx; x++){
 		for (int y = 0; y < ny; y++){
 			move(y + 2, x);
-			if (m[y][x] == CHR_KNIGHT){
-				addch(m[y][x] | COLOR_PAIR(1));
+			switch(m[y][x]){
+				case CHR_KNIGHT:
+					addch(m[y][x] | COLOR_PAIR(1));
+					break;
+				case CHR_PRINCESS:
+					addch(m[y][x] | COLOR_PAIR(2));
+					break;
+				case CHR_DRAGON:
+					addch(m[y][x] | COLOR_PAIR(3));
+					break;
+				default:
+					addch(m[y][x]);	
 			}
-			if (m[y][x] == CHR_PRINCESS){
-				addch(m[y][x] | COLOR_PAIR(2));
-			}
-			addch(m[y][x]);
+			// if (m[y][x] == CHR_KNIGHT){
+			// 	addch(m[y][x] | COLOR_PAIR(1));
+			// }
+			// if (m[y][x] == CHR_PRINCESS){
+			// 	addch(m[y][x] | COLOR_PAIR(2));
+			// }
+			// addch(m[y][x]);
 		}
 	}
 	move(2, 0);

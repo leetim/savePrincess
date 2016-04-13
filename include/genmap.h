@@ -3,8 +3,8 @@
 
 #define N 50
 #define M 30
-#define MIN_L 5
-#define MAX_L 8
+#define MIN_L 3
+#define MAX_L 15
 
 #define LEFT_POINT Point(-1, 0)
 #define RIGHT_POINT Point(1, 0)
