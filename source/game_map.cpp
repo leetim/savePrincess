@@ -61,6 +61,12 @@ void GameMap::reDraw(){
 				case CHR_DRAGON:
 					addch(m[y][x] | COLOR_PAIR(3));
 					break;
+				case CHR_WITCH:
+					addch(m[y][x] | COLOR_PAIR(4));
+					break;
+				case CHR_ZOMBIE:
+					addch(m[y][x] | COLOR_PAIR(5));
+					break;
 				default:
 					addch(m[y][x]);	
 			}
@@ -85,7 +91,7 @@ cell GameMap::getCell(const Point& p){
 //Получает координаты символа линейным поиском
 Point GameMap::getCoord(const char& c){
 	Point p = random_point(ny, nx);
-	while (m[p.y][p.x] != '.'){
+	while (m[p.y][p.x] != CHR_NOTHING){
 		p = random_point(ny, nx);
 	}
 	m[p.y][p.x] = c;
@@ -111,6 +117,12 @@ Point GameMap::princessCoord(){
 Point GameMap::zombieCoord(){
 	return getCoord(CHR_ZOMBIE);
 }
+
+//Получает координаты символа 'W' на момент написания коментария обозначающий зомби
+Point GameMap::witchCoord(){
+	return getCoord(CHR_WITCH);
+}
+
 
 GameMap::~GameMap(){
 	delete_array(m);

@@ -1,6 +1,9 @@
 #pragma once
 #define SQR(x) ((x)*(x))
 
+#define CHR_WALL '#'
+#define CHR_NOTHING ' '
+
 #define N 50
 #define M 30
 #define MIN_L 3

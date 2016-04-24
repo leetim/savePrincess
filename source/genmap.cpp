@@ -87,7 +87,7 @@ void print_p(Point p){
 void Room::draw(char** a){
 	for (int x = leftTop.x + 1; x < rightBottom.x; x++){
 		for(int y = leftTop.y + 1; y < rightBottom.y; y++){
-			a[y][x] = '.';
+			a[y][x] = CHR_NOTHING;
 		}
 	}
 }
@@ -118,7 +118,7 @@ Point Room::center(){
 
 //подсчет стоимости прохождения через клетку
 static int cost(char** myMap, Point p, Point finish){
-	int v = (myMap[p.y][p.x] == '.') ? 1 : 1000000000;
+	int v = (myMap[p.y][p.x] == CHR_NOTHING) ? 1 : 1000000000;
 	return v;
 }
 
@@ -162,7 +162,7 @@ static void search_way(char** myMap, int n, int m, Point p1, Point p2){
 						t = t+UP_POINT;
 						break;
 				}
-				myMap[t.y][t.x] = '.';
+				myMap[t.y][t.x] = CHR_NOTHING;
 			}
 			return;
 		}
@@ -188,7 +188,7 @@ void makeRandomRooms(char** myMap, int n, int m){
 	vector <Room> a;
 	for (int i = 0; i < n; i++){
 		for (int j = 0; j < m - 1; j++){
-			myMap[i][j] = '#';
+			myMap[i][j] = CHR_WALL;
 		}
 		myMap[i][m - 1] = '\0';
 	}

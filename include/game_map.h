@@ -3,12 +3,16 @@
 #include <ncurses.h>
 
 #define MAP_SIZE 50
-#define CHR_WALL '#'
-#define CHR_NOTHING '.'
 #define CHR_KNIGHT 'K'
 #define CHR_PRINCESS 'P'
 #define CHR_ZOMBIE 'Z'
 #define CHR_DRAGON 'D'
+#define CHR_FIREBALL_UP '^'
+#define CHR_FIREBALL_DOWN 'v'
+#define CHR_FIREBALL_LEFT '<'
+#define CHR_FIREBALL_RIGHT '>'
+#define CHR_MEDKIT '+'
+#define CHR_WITCH 'W'
 
 #define UP_CODE 0
 #define RIGHT_CODE 1
@@ -31,6 +35,7 @@ public:
 	Point playerCoord();
 	Point princessCoord();
 	Point zombieCoord();
+	Point witchCoord();
 	~GameMap();
 	int ny;
 	int nx;
