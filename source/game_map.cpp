@@ -118,12 +118,22 @@ Point GameMap::zombieCoord(){
 	return getCoord(CHR_ZOMBIE);
 }
 
-//Получает координаты символа 'W' на момент написания коментария обозначающий зомби
+//Получает координаты символа 'W' на момент написания коментария обозначающий вудьму
 Point GameMap::witchCoord(){
 	return getCoord(CHR_WITCH);
 }
 
+//Получает координаты символа 'M' на момент написания коментария обозначающий аптечку
+Point GameMap::medkitCoord(){
+	return getCoord(CHR_MEDKIT);
+}
 
+//Получение координат символа С для спаунера
+Point GameMap::spawnerCoord(char C){
+	return getCoord(C);
+}
+
+//Деструктор
 GameMap::~GameMap(){
 	delete_array(m);
 }

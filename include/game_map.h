@@ -11,7 +11,7 @@
 #define CHR_FIREBALL_DOWN 'v'
 #define CHR_FIREBALL_LEFT '<'
 #define CHR_FIREBALL_RIGHT '>'
-#define CHR_MEDKIT '+'
+#define CHR_MEDKIT 'M'
 #define CHR_WITCH 'W'
 
 #define UP_CODE 0
@@ -36,6 +36,8 @@ public:
 	Point princessCoord();
 	Point zombieCoord();
 	Point witchCoord();
+	Point medkitCoord();
+	Point spawnerCoord(char C);
 	~GameMap();
 	int ny;
 	int nx;

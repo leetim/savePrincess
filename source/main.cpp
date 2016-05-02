@@ -42,6 +42,8 @@ int main(){
 	princess = new Princess(&myMap);
 	monsters.push_back(player);
 	monsters.push_back(princess);
+	monsters.push_back(new Spawner<Zombie, '+'>(&myMap));
+	monsters.push_back(new Spawner<Dragon, '&'>(&myMap));
 	for (int i = 0; i < drag_count; i++){
 		monsters.push_back(new Dragon(&myMap));
 	}
@@ -52,7 +54,9 @@ int main(){
 		monsters.push_back(new Witch(&myMap));
 	}
 	bool game = false;
+	long step_count = 1;
 	while(!game){
+		logi << "next" << endl;
 		clear();
 		myMap.reDraw();
 		move(0, 0);
@@ -66,14 +70,22 @@ int main(){
 			break;
 		}
 		for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
+			logi << "start move " << (*i) << endl;
 			(*i)->move();
+			logi << "done move" << endl;
 		}
+		logi << "done step" << endl;
 		if (player->hitPoint() <= 0 || princess->hitPoint() <= 0){
 			game = true;
 			clear();
 			move(1, 0);
 			printw("YOU LOSE!!!!");
 		}
+		if (!(step_count % 5)){
+			monsters.push_back(new Medkit(&myMap));	
+		}
+		spawn_all();
+		step_count++;
 	}	
 	for (int i = 0; i < (int)monsters.size(); i++){
 		delete monsters[i];

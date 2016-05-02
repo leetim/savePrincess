@@ -13,6 +13,7 @@ extern vector<PCharacter> monsters;
 extern PCharacter player;
 extern PCharacter princess;
 extern ofstream logi;
+vector<PCharacter> new_monsters;
 
 //Процедуры
 PCharacter colide_all(PCharacter carrent_character, const Point& new_point){
@@ -33,6 +34,15 @@ PCharacter colide_all(PCharacter carrent_character, const Point& new_point){
 		}
 	}
 	return NULL;
+}
+
+void spawn_all(){
+	for (int i = 0; i < new_monsters.size(); i++){
+		monsters.push_back(new_monsters[i]);
+		Point &pos = new_monsters	[i]->position;
+		new_monsters[i]->myMap->setCharacter(new_monsters[i]->getChr(), pos.x, pos.y);
+	}
+	new_monsters.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -75,9 +85,9 @@ Character::~Character(){
 
 
 void Character::spawn(PCharacter chr, const Point& pos){
-	myMap->setCharacter(chr->getChr(), pos.x, pos.y);
+	// myMap->setCharacter(chr->getChr(), pos.x, pos.y);
 	chr->position = pos;
-	monsters.push_back(chr);
+	new_monsters.push_back(chr);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -136,11 +146,15 @@ void Knight::colide(Monster* chr, const Point& new_point){
 	}
 }
 
-void Knight::colide(FireBall* chr, const Point& new_point){
+void Knight::colide(Object* chr, const Point& new_point){
 	const Point& np = new_point;
 	Point& p = position;
-	this->makeDamage(chr->getDamage());
 	chr->makeDamage(damage);
+	if (chr->hitPoint() <= 0){
+		myMap->moveCharacter(np.x, np.y, p.x, p.y);
+		p = np;
+	}
+	this->makeDamage(chr->getDamage());
 }
 
 
@@ -148,7 +162,7 @@ void Knight::colide(FireBall* chr, const Point& new_point){
 void Knight::move(){
 	// char comand[15];
 	// cin >> comand;
-	// cout << "123" << endl;
+	logi << "move knight" << endl;
 	Point &p = position;
 	Point np;
 	switch (getch()){
@@ -180,8 +194,8 @@ void Knight::move(){
 		position = np;
 		return;
 	}
-	PCharacter target = colide_all(this, np);
-	cout << "123" << endl;
+	colide_all(this, np);
+	// cout << "123" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +207,7 @@ void Monster::colide(Character* chr, const Point& new_point){
 
 void Monster::colide(Knight* chr, const Point& new_point){
 	const Point& np = new_point;
-		Point& p = position;
+	Point& p = position;
 	chr->makeDamage(damage);
 	if (chr->hitPoint() <= 0){
 		myMap->moveCharacter(np.x, np.y, p.x, p.y);
@@ -201,12 +215,17 @@ void Monster::colide(Knight* chr, const Point& new_point){
 	}	
 }
 
-void Monster::colide(FireBall* chr, const Point& new_point){
-	logi << "colide m!" << endl;
+void Monster::colide(Object* chr, const Point& new_point){
+	logi << "colide m o!" << endl;
 	const Point& np = new_point;
 	Point& p = position;
-	this->makeDamage(chr->getDamage());
 	chr->makeDamage(damage);
+	if (chr->hitPoint() <= 0){
+		myMap->moveCharacter(np.x, np.y, p.x, p.y);
+		p = np;
+	}
+	this->makeDamage(chr->getDamage());
+	logi << " finish colide m o!" << endl;
 }
 
 //перемещение
@@ -250,8 +269,49 @@ void Monster::move(){
 		this->makeDamage(2);
 	}
 	else{
-		PCharacter target = colide_all(this, np);
+		colide_all(this, np);
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Object
+
+void Object::colide(Character* chr, const Point& new_point){
+	// logi << "colide a!" << endl;
+	chr->colide(this, new_point);
+}
+
+void Object::colide(Knight* chr, const Point& new_point){
+	// const Point& np = new_point;
+	// Point& p = position;
+	this->makeDamage(chr->getDamage());
+	chr->makeDamage(damage);
+}
+
+void Object::colide(Monster* chr, const Point& new_point){
+	logi << "colide o m!" << endl;
+	// logi << "colide m!" << endl;
+	// const Point& np = new_point;
+	// Point& p = position;
+	this->makeDamage(chr->getDamage());
+	chr->makeDamage(damage);
+}
+
+
+void Object::colide(Object* chr, const Point& new_point){
+	// logi << "colide! s" << endl;
+	// const Point& np = new_point;
+	// Point& p = position;
+	this->makeDamage(chr->getDamage());
+	chr->makeDamage(damage);
+}
+
+void Object::colide(Princess* chr, const Point& new_point){
+	// logi << "colide! s" << endl;
+	// const Point& np = new_point;
+	// Point& p = position;
+	this->makeDamage(chr->getDamage());
+	// chr->makeDamage(damage);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -279,71 +339,56 @@ FireBall::FireBall(PGameMap m, Point dir){
 	}
 }
 
-
-void FireBall::colide(Character* chr, const Point& new_point){
-	logi << "colide a!" << endl;
-	chr->colide(this, new_point);
-}
-
-void FireBall::colide(Knight* chr, const Point& new_point){
-	const Point& np = new_point;
-	Point& p = position;
-	this->makeDamage(chr->getDamage());
-	chr->makeDamage(damage);
-}
-
-void FireBall::colide(Monster* chr, const Point& new_point){
-	logi << "colide m!" << endl;
-	const Point& np = new_point;
-	Point& p = position;
-	this->makeDamage(chr->getDamage());
-	chr->makeDamage(damage);
-}
-
-
-void FireBall::colide(FireBall* chr, const Point& new_point){
-	logi << "colide! s" << endl;
-	const Point& np = new_point;
-	Point& p = position;
-	this->makeDamage(chr->getDamage());
-	chr->makeDamage(damage);
-}
-
-void FireBall::colide(Princess* chr, const Point& new_point){
-	logi << "colide! s" << endl;
-	const Point& np = new_point;
-	Point& p = position;
-	this->makeDamage(chr->getDamage());
-	// chr->makeDamage(damage);
-}
-
-
 void FireBall::move(){
 	if (hp <= 0){
+		logi << "oops" << endl;
 		return;
 	}
 	Point np = position + direction;
 	const Point& p = position;
-	logi << p.x << " " << p.y << myMap->getCell(p) << endl;
+	logi << "fireball move" << endl;
+	logi << np.x << " " << np.y << endl; 
 	cell c = myMap->getCell(np);
 	if (c == CHR_NOTHING){
+		logi << "nothing" << endl;
 		myMap->moveCharacter(p.x, p.y, np.x, np.y);
 	}
 	else{
+		logi << "not nothing" << endl;
 		colide_all(this, np);
 	}
 	if (c == CHR_WALL){
+		logi << "wall" << endl;
 		makeDamage(10);
+		return;
 	}
 	position = np;
+	logi << "T_T" << endl;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Medkit
+
+Medkit::Medkit(PGameMap m){
+	myMap = m;
+	position = m->medkitCoord();
+	damage = DMG_MEDKIT;
+	hp = HP_OBJECT;
+	symbol = CHR_MEDKIT;
+	max_hp = HP_OBJECT;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Zombie
 
-Zombie::Zombie(PGameMap m){
+Zombie::Zombie(PGameMap m, Point p){
 	myMap = m;
-	position = m->zombieCoord();
+	if (p == Point(-1, -1)){
+		position = m->zombieCoord();
+	}
+	else{
+		position = p;
+	}
 	damage = DMG_ZOMBIE;
 	hp = HP_ZOMBIE;
 	symbol = CHR_ZOMBIE;
@@ -353,9 +398,14 @@ Zombie::Zombie(PGameMap m){
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Dragon
 
-Dragon::Dragon(PGameMap m){
+Dragon::Dragon(PGameMap m, Point p){
 	myMap = m;
-	position = m->dragonCoord();
+	if (p == Point(-1, -1)){
+		position = m->dragonCoord();
+	}
+	else{
+		position = p;
+	}
 	damage = DMG_DRAGON;
 	hp = HP_DRAGON;
 	symbol = CHR_DRAGON;
@@ -384,6 +434,7 @@ static Point map_search(PGameMap m, Point cur, Point dir){
 }
 
 void Witch::move(){
+	logi << "move witch" << endl;
 	if (hp <= 0){
 		return;
 	}
@@ -396,9 +447,10 @@ void Witch::move(){
 		}
 		cur = map_search(myMap, position + a[i], a[i]);
 		if (!(cur == Point(-1, -1))){
-			logi << "spawn" << endl;
 			PCharacter c = new FireBall(myMap, a[i]);
+			logi << "spawn " << c << endl;
 			spawn(c, p + a[i]);
+			logi << (*(monsters.end() - 1)) << endl;
 			return;
 		}
 	}
