@@ -3,18 +3,19 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#define HP_KNIGHT 10000
-#define HP_PRINCESS 5000
-#define HP_ZOMBIE 1400
-#define HP_DRAGON 2800
-#define HP_OBJECT 1
-#define HP_WITCH 700
-#define DMG_KNIGHT 700
-#define DMG_PRINCESS 10
-#define DMG_ZOMBIE 450
-#define DMG_DRAGON 800
-#define DMG_MEDKIT -300
-#define DMG_FIREBALL 500
+#include <configuration.h>
+#define HP_KNIGHT conf->getMaxHP("KNIGHT")
+#define HP_PRINCESS conf->getMaxHP("PRINCESS")
+#define HP_ZOMBIE conf->getMaxHP("ZOMBIE")
+#define HP_DRAGON conf->getMaxHP("DRAGON")
+#define HP_OBJECT conf->getMaxHP("OBJECT")
+#define HP_WITCH conf->getMaxHP("WITCH")
+#define DMG_KNIGHT conf->getDamage("KNIGHT")
+#define DMG_PRINCESS conf->getDamage("PRINCESS")
+#define DMG_ZOMBIE conf->getDamage("ZOMBIE")
+#define DMG_DRAGON conf->getDamage("DRAGON")
+#define DMG_MEDKIT conf->getDamage("MEDKIT")
+#define DMG_FIREBALL conf->getDamage("FIREBALL")
 
 #define ZOMBIE_COUNT 70
 #define DRAGONS_COUNT 1
@@ -59,6 +60,7 @@ extern std::vector<PCharacter> monsters;
 extern PCharacter player;
 extern PCharacter princess;
 extern std::ofstream logi;
+extern Configuration* conf;
 
 class Princess: public Character{
 public:

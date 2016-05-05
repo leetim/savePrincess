@@ -14,6 +14,7 @@ set(SOURCE_EXECUTABLE ./source/main.cpp)
 set(CHARACTER_SOURCE ./source/character.cpp)
 set(GAMEMAP_SOURCE ./source/game_map.cpp)
 set(GENMAP_SOURCE ./source/genmap.cpp)
+set(CONFIGURATION_SOURCE ./source/configuration.cpp)
 
-add_executable(main ${SOURCE_EXECUTABLE} ${CHARACTER_SOURCE} ${GAMEMAP_SOURCE} ${GENMAP_SOURCE})
+add_executable(main ${SOURCE_EXECUTABLE} ${CHARACTER_SOURCE} ${GAMEMAP_SOURCE} ${GENMAP_SOURCE} ${CONFIGURATION_SOURCE})
 target_link_libraries(main ncurses)

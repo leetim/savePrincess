@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <ctime>
 #include <algorithm>
+#include <configuration.h>
 // #include <ncurses.h>
 
 using namespace std;
@@ -13,6 +14,7 @@ vector<PCharacter> monsters;
 PCharacter player;
 PCharacter princess;
 ofstream logi("log.txt");
+Configuration* conf;
 
 // extern ofstream logi;
 
@@ -21,9 +23,31 @@ void status(PCharacter ch, int max_hp, const char a[]){
 }
 
 int main(){
-	// logi.open;
+	try{
+		conf = new Configuration();
+	}
+	catch(string err){
+		cout << err << endl;
+		// delete conf;
+		return -1;
+	}
+
+
+	// cout << "hp " << HP_KNIGHT << endl;
+	// cout << "hp " << HP_PRINCESS << endl;
+	// cout << "hp " << HP_ZOMBIE << endl;
+	// cout << "hp " << HP_DRAGON << endl;
+	// cout << "hp " << HP_OBJECT << endl;
+	// cout << "hp " << HP_WITCH << endl;
+	// cout << "damage " << DMG_KNIGHT << endl;
+	// cout << "damage " << DMG_PRINCESS << endl;
+	// cout << "damage " << DMG_ZOMBIE << endl;
+	// cout << "damage " << DMG_DRAGON << endl;
+	// cout << "damage " << DMG_MEDKIT << endl;
+	// cout << "damage " << DMG_FIREBALL << endl;
+
+	// return 0;
 	srand(time(0));
-	// GameMap myMap("castle.map");
 	initscr();
 	int n = getmaxy(stdscr) - 3;
 	int m = getmaxx(stdscr) - 1;
@@ -91,42 +115,6 @@ int main(){
 		delete monsters[i];
 	}
 	getch();
-	// for (int i = 0; i < 10; i++){
-	// 	for (int j = 0; j < 10; j++){
-	// 		cout << '#';
-	// 	}
-	// 	cout << endl;
-	// }
-	// int x = 1; 
-	// int y = 1;
-	// move(y, x);
-	// addch('K' | COLOR_PAIR(1));
-	// move(11, 11);
-	// printw("Hellow");
-	// bool goo = true;
-	// while (goo){
-	// 	refresh();
-	// 	int ch = getch();
-	// 	move(y, x);
-	// 	addch('#');
-	// 	switch (ch){
-	// 		case (int)'w':
-	// 			y--;
-	// 			break;
-	// 		case (int)'a':
-	// 			x--;
-	// 			break;
-	// 		case (int)'d':
-	// 			x++;
-	// 			break;
-	// 		case (int)'s':
-	// 			y++;
-	// 			break;
-	// 	}
-	// 	move(y, x);
-	// 	addch('K' | COLOR_PAIR(1));
-	// 	move(0, 0);
-	// }
 	endwin();
 	return 0;
 }
