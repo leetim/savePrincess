@@ -149,16 +149,16 @@ static void search_way(char** myMap, int n, int m, Point p1, Point p2){
 			Point t = p2;
 			while (!(t == p1)){
 				switch(ch[t.y][t.x]){
-					case '>': 
+					case '>':
 						t = t+RIGHT_POINT;
 						break;
-					case '<': 
+					case '<':
 						t = t+LEFT_POINT;
 						break;
-					case 'v': 
+					case 'v':
 						t = t+DOWN_POINT;
 						break;
-					case '^': 
+					case '^':
 						t = t+UP_POINT;
 						break;
 				}
@@ -233,13 +233,13 @@ void makeRandomRooms(char** myMap, int n, int m){
 //Выделение памяти под двумерный массив
 void get_array(char**& a, int n, int m){
 	a = new char*[n];
-	char* b = new char[n * m];
+	char* b = new char[n * (m+1)];
 	for (int i = 0; i < n; i++){
-		a[i] = &b[i * m];
+		a[i] = &b[i * (m + 1)];
 	}
 }
 
-//Удаление двумерного массива 
+//Удаление двумерного массива
 void delete_array(char**& a){
 	delete[] a[0];
 	delete[] a;

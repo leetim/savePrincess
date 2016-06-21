@@ -10,7 +10,7 @@ using namespace std;
 // }
 
 // bool isWord(string s){
-// 
+//
 // }
 
 bool isNumber(string s){
@@ -84,6 +84,9 @@ void Configuration::getclass_name(){
 	string temp;
 	input >> temp;
 	if (isNumber(temp)){
+		if (temp == ""){
+			return;
+		}
 		error("Wrong format of class name " + temp);
 	}
 	begin(temp);
@@ -136,7 +139,7 @@ void Configuration::assigment(string classname, string stats_name){
 		max_hp[classname] = get_value();
 		get_statename(classname);
 		return;
-	}	
+	}
 	error("unknown stats name for " + classname);
 
 }

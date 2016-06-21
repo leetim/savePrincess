@@ -25,7 +25,7 @@ typedef char cell;
 class GameMap{
 public:
 	GameMap();
-	GameMap(int n, int m);
+	GameMap(int n, int m, char** a);
 	GameMap(const char file[]);
 	void setCharacter(cell c, int x, int y);
 	void moveCharacter(int x1, int y1, int x2, int y2);
@@ -44,6 +44,7 @@ public:
 private:
 	Point getCoord(const char& c);
 	cell** m;
+	bool is_my_pointer;
 };
 
 typedef GameMap* PGameMap;

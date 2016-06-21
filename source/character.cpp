@@ -17,7 +17,7 @@ vector<PCharacter> new_monsters;
 
 //Процедуры
 PCharacter colide_all(PCharacter carrent_character, const Point& new_point){
-	// vector <vector<PCharacter>::iterator> cemetery; 
+	// vector <vector<PCharacter>::iterator> cemetery;
 	// for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
 	// 	if ((*i)->hitPoint() <= 0){
 	// 		cemetery.push_back(i);
@@ -37,12 +37,126 @@ PCharacter colide_all(PCharacter carrent_character, const Point& new_point){
 }
 
 void spawn_all(){
-	for (int i = 0; i < new_monsters.size(); i++){
+	for (unsigned int i = 0; i < new_monsters.size(); i++){
 		monsters.push_back(new_monsters[i]);
 		Point &pos = new_monsters	[i]->position;
 		new_monsters[i]->myMap->setCharacter(new_monsters[i]->getChr(), pos.x, pos.y);
 	}
 	new_monsters.clear();
+}
+
+void status(PCharacter ch, int max_hp, const char a[]){
+	printw("%s: %g%%", a, (double)ch->hitPoint() / max_hp * 100.0);
+}
+
+void create_character(char c, int x, int y, GameMap* gm){
+	// logi << c << endl;
+	switch (c){
+	case CHR_KNIGHT:
+		player = new Knight(gm, Point(x, y));
+		monsters.push_back(player);
+		break;
+	case CHR_PRINCESS:
+		princess = new Princess(gm, Point(x, y));
+		monsters.push_back(princess);
+		break;
+	case CHR_ZOMBIE:
+		monsters.push_back(new Zombie(gm, Point(x, y)));
+		break;
+	case CHR_DRAGON:
+		monsters.push_back(new Dragon(gm, Point(x, y)));
+		break;
+	case CHR_MEDKIT:
+		monsters.push_back(new Medkit(gm, Point(x, y)));
+		break;
+	case CHR_WITCH:
+		monsters.push_back(new Witch(gm, Point(x, y)));
+		break;
+	case '+':
+		monsters.push_back(new Spawner<Zombie, '+'>(gm, Point(x, y)));
+		break;
+	case '&':
+		monsters.push_back(new Spawner<Dragon, '&'>(gm, Point(x, y)));
+		break;
+	}
+}
+
+void start_game(int n, int m, char** a){
+	int drag_count = max(m * n / 200, DRAGONS_COUNT);
+	int witch_count = max(m * n / 200, 4);
+	int zomb_count = m * n / 25;
+	GameMap myMap = GameMap(n, m, a);
+
+	init_pair(1, COLOR_RED, COLOR_WHITE);
+	init_pair(2, COLOR_GREEN, COLOR_WHITE);
+	init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(4, COLOR_BLUE, COLOR_BLACK);
+	init_pair(5, COLOR_GREEN, COLOR_BLACK);
+
+	if (a == NULL){
+		player = new Knight(&myMap);
+		princess = new Princess(&myMap);
+		monsters.push_back(player);
+		monsters.push_back(princess);
+		monsters.push_back(new Spawner<Zombie, '+'>(&myMap));
+		monsters.push_back(new Spawner<Dragon, '&'>(&myMap));
+		for (int i = 0; i < drag_count; i++){
+			monsters.push_back(new Dragon(&myMap));
+		}
+		for(int i = 0; i < zomb_count; i++){
+			monsters.push_back(new Zombie(&myMap));
+		}
+		for(int i = 0; i < witch_count; i++){
+			monsters.push_back(new Witch(&myMap));
+		}
+	}
+	else{
+		logi << "gogogogo" << endl;
+		for (int x = 0; x < m; x++){
+			for (int y = 0; y < n; y++){
+				create_character(a[y][x], x, y, &myMap);
+			}
+		}
+	}
+	logi << monsters.size() << endl;
+	bool game = false;
+	long step_count = 1;
+	while(!game){
+		logi << "next" << endl;
+		clear();
+		myMap.reDraw();
+		move(0, 0);
+		status(player, HP_KNIGHT, "Knight");
+		move(1, 0);
+		status(princess, HP_PRINCESS, "Princess");
+		if (player->coord() == princess->coord()){
+			clear();
+			move(1, 0);
+			printw("YOU WIN!!!!");
+			break;
+		}
+		for (vector<PCharacter>::iterator i = monsters.begin(); i != monsters.end(); i++){
+			logi << "start move " << (*i) << endl;
+			(*i)->move();
+			logi << "done move" << endl;
+		}
+		logi << "done step" << endl;
+		if (player->hitPoint() <= 0 || princess->hitPoint() <= 0){
+			game = true;
+			clear();
+			move(1, 0);
+			printw("YOU LOSE!!!!");
+		}
+		if (!(step_count % 5)){
+			monsters.push_back(new Medkit(&myMap));
+		}
+		spawn_all();
+		step_count++;
+	}
+	for (int i = 0; i < (int)monsters.size(); i++){
+		delete monsters[i];
+	}
+	monsters.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -93,9 +207,14 @@ void Character::spawn(PCharacter chr, const Point& pos){
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Princess
 //Стандартный конструктор для принцессы
-Princess::Princess(PGameMap m){
+Princess::Princess(PGameMap m, Point p){
 	myMap = m;
-	position = myMap->princessCoord();
+	if (p == Point(-1, -1)){
+		position = myMap->princessCoord();
+	}
+	else{
+		position = p;
+	}
 	damage = DMG_PRINCESS;
 	hp = HP_PRINCESS;
 	symbol = CHR_PRINCESS;
@@ -115,9 +234,14 @@ void Princess::move(){
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Knight
 //Стандартный конструктор
-Knight::Knight(PGameMap m){
+Knight::Knight(PGameMap m, Point p){
 	myMap = m;
-	position = myMap->playerCoord();
+	if (p == Point(-1, -1)){
+		position = myMap->playerCoord();
+	}
+	else{
+		position = p;
+	}
 	hp = HP_KNIGHT;
 	damage = DMG_KNIGHT;
 	symbol = CHR_KNIGHT;
@@ -212,7 +336,7 @@ void Monster::colide(Knight* chr, const Point& new_point){
 	if (chr->hitPoint() <= 0){
 		myMap->moveCharacter(np.x, np.y, p.x, p.y);
 		position = np;
-	}	
+	}
 }
 
 void Monster::colide(Object* chr, const Point& new_point){
@@ -347,7 +471,7 @@ void FireBall::move(){
 	Point np = position + direction;
 	const Point& p = position;
 	logi << "fireball move" << endl;
-	logi << np.x << " " << np.y << endl; 
+	logi << np.x << " " << np.y << endl;
 	cell c = myMap->getCell(np);
 	if (c == CHR_NOTHING){
 		logi << "nothing" << endl;
@@ -369,9 +493,14 @@ void FireBall::move(){
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Medkit
 
-Medkit::Medkit(PGameMap m){
+Medkit::Medkit(PGameMap m, Point p){
 	myMap = m;
-	position = m->medkitCoord();
+	if (p == Point(-1, -1)){
+		position = m->medkitCoord();
+	}
+	else{
+		position = p;
+	}
 	damage = DMG_MEDKIT;
 	hp = HP_OBJECT;
 	symbol = CHR_MEDKIT;
@@ -414,9 +543,14 @@ Dragon::Dragon(PGameMap m, Point p){
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Witch
-Witch::Witch(PGameMap m){
+Witch::Witch(PGameMap m, Point p){
 	myMap = m;
-	position = m->witchCoord();
+	if (p == Point(-1, -1)){
+		position = m->witchCoord();
+	}
+	else{
+		position = p;
+	}
 	hp = HP_WITCH;
 	damage = DMG_FIREBALL;
 	symbol = CHR_WITCH;
@@ -426,7 +560,7 @@ Witch::Witch(PGameMap m){
 static Point map_search(PGameMap m, Point cur, Point dir){
 	while (m->getCell(cur) == CHR_NOTHING){
 		cur = cur + dir;
-	}	
+	}
 	if (m->getCell(cur) == CHR_KNIGHT){
 		return cur;
 	}

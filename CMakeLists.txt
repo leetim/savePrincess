@@ -17,4 +17,6 @@ set(GENMAP_SOURCE ./source/genmap.cpp)
 set(CONFIGURATION_SOURCE ./source/configuration.cpp)
 
 add_executable(main ${SOURCE_EXECUTABLE} ${CHARACTER_SOURCE} ${GAMEMAP_SOURCE} ${GENMAP_SOURCE} ${CONFIGURATION_SOURCE})
+add_executable(map_editor ./source/map_editor.cpp ${CHARACTER_SOURCE} ${GAMEMAP_SOURCE} ${GENMAP_SOURCE} ${CONFIGURATION_SOURCE})
 target_link_libraries(main ncurses)
+target_link_libraries(map_editor ncurses)

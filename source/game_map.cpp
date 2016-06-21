@@ -16,11 +16,17 @@ GameMap::GameMap(){
 }
 
 
-GameMap::GameMap(int _n, int _m){
-	get_array(m, _n, _m + 1);
+GameMap::GameMap(int _n, int _m, char** a){
 	nx = _m;
 	ny = _n;
-	makeRandomRooms(m, _n, _m + 1);
+	if (a == NULL){
+		get_array(m, _n, _m + 1);
+		makeRandomRooms(m, _n, _m + 1);
+	}
+	else{
+		m = a;
+	}
+	is_my_pointer = (a == NULL);
 }
 
 //Конструктор из файла с картой
@@ -68,7 +74,7 @@ void GameMap::reDraw(){
 					addch(m[y][x] | COLOR_PAIR(5));
 					break;
 				default:
-					addch(m[y][x]);	
+					addch(m[y][x]);
 			}
 			// if (m[y][x] == CHR_KNIGHT){
 			// 	addch(m[y][x] | COLOR_PAIR(1));
@@ -135,5 +141,7 @@ Point GameMap::spawnerCoord(char C){
 
 //Деструктор
 GameMap::~GameMap(){
-	delete_array(m);
+	if (is_my_pointer){
+		delete_array(m);
+	}
 }

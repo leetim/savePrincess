@@ -30,6 +30,7 @@ class FireBall;
 typedef Character* PCharacter;
 
 void spawn_all();
+void start_game(int n, int m, char** a);
 
 class Character{
 public:
@@ -37,7 +38,7 @@ public:
 	int getDamage();
 	void makeDamage(int dmg);
 	char getChr();
-	virtual void colide(Character* chr, const Point& new_point)=0; 
+	virtual void colide(Character* chr, const Point& new_point)=0;
 	virtual void colide(Knight* chr, const Point& new_point)=0;
 	virtual void colide(Princess* chr, const Point& new_point)=0;
 	virtual void colide(Monster* chr, const Point& new_point)=0;
@@ -64,7 +65,7 @@ extern Configuration* conf;
 
 class Princess: public Character{
 public:
-	Princess(PGameMap m);
+	Princess(PGameMap m, Point p = Point(-1, -1));
 	void colide(Character* chr, const Point& new_point);
 	void colide(Knight* chr, const Point& new_point){};
 	void colide(Princess* chr, const Point& new_point){};
@@ -75,7 +76,7 @@ public:
 
 class Knight: public Character{
 public:
-	Knight(PGameMap m);
+	Knight(PGameMap m, Point p = Point(-1, -1));
 	void colide(Character* chr, const Point& new_point);
 	void colide(Knight* chr, const Point& new_point){};
 	void colide(Princess* chr, const Point& new_point);
@@ -107,14 +108,19 @@ public:
 template<class T, char C = '+'>
 class Spawner: public Character{
 public:
-	Spawner(PGameMap m){
+	Spawner(PGameMap m, Point p = Point(-1, -1)){
 		myMap = m;
-		position = m->spawnerCoord(C);
+		if (p == Point(-1, -1)){
+			position = m->spawnerCoord(C);
+		}
+		else{
+			position = p;
+		}
 		damage = 0;
 		hp = HP_OBJECT;
 		symbol = C;
 		max_hp = HP_OBJECT;
-		step = 0;	
+		step = 0;
 	};
 
 	void move(){
@@ -153,7 +159,7 @@ private:
 
 class Medkit: public Object{
 public:
-	Medkit(PGameMap m);
+	Medkit(PGameMap m, Point p = Point(-1, -1));
 };
 
 class Zombie: public Monster{
@@ -168,7 +174,6 @@ public:
 
 class Witch: public Monster{
 public:
-	Witch(PGameMap m);
+	Witch(PGameMap m, Point p = Point(-1, -1));
 	void move();
 };
-
