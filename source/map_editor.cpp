@@ -5,6 +5,7 @@
 #include <iostream>
 #include <character.h>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -33,8 +34,10 @@ void print_legend(){
     printw("Legend: F3"); move(13, 2);
     printw("Exit: F4"); move(14, 2);
     printw("Start Game: F5"); move(15, 2);
-    printw("Clear: Space"); move(16, 2);
-    printw("Press any key for continue"); move(17, 2);
+    printw("Save Map: 'p'"); move(16, 2);
+    printw("Open Map: 'o'"); move(17, 2);
+    printw("Clear: Space"); move(18, 2);
+    printw("Press any key for continue");
     getch();
 }
 
@@ -135,8 +138,17 @@ void open_map(char** map, int& max_x, int& max_y){
     ifstream fin(get_file());
     char buf[200];
     fin >> buf;
-    if (string(buf) != "SAVE_PRINCESS"){
-        throw 1;
+    try{
+        if (string(buf) != "SAVE_PRINCESS"){
+            throw 1;
+        }
+    }
+    catch(...){
+        clear();
+        move(0, 0);
+        printw("Wrang format of file\n");
+        getch();
+        return;
     }
     fin >> max_x >> max_y;
     fin.getline(buf, 200);
@@ -209,36 +221,6 @@ void get_char(Point& pos, char** map, int& max_x, int& max_y, bool& finish){
     case 's':
         change_cursor_pos(pos, DOWN_POINT, max_x, max_y);
         break;
-    case CHR_KNIGHT:
-        change_char(map, pos, max_x, max_y, CHR_KNIGHT);
-        break;
-    case CHR_PRINCESS:
-        change_char(map, pos, max_x, max_y, CHR_PRINCESS);
-        break;
-    case CHR_ZOMBIE:
-        change_char(map, pos, max_x, max_y, CHR_ZOMBIE);
-        break;
-    case CHR_DRAGON:
-        change_char(map, pos, max_x, max_y, CHR_DRAGON);
-        break;
-    case CHR_MEDKIT:
-        change_char(map, pos, max_x, max_y, CHR_MEDKIT);
-        break;
-    case CHR_WITCH:
-        change_char(map, pos, max_x, max_y, CHR_WITCH);
-        break;
-    case CHR_NOTHING:
-        change_char(map, pos, max_x, max_y, CHR_NOTHING);
-        break;
-    case CHR_WALL:
-        change_char(map, pos, max_x, max_y, CHR_WALL);
-        break;
-    case '+':
-        change_char(map, pos, max_x, max_y, '+');
-        break;
-    case '&':
-        change_char(map, pos, max_x, max_y, '&');
-        break;
     case 81:
         save_map(map, max_x, max_y);
         break;
@@ -275,6 +257,10 @@ void get_char(Point& pos, char** map, int& max_x, int& max_y, bool& finish){
     case 112:
         save_map(map, max_x, max_y);
         break;
+    }
+    set<char> change = {CHR_KNIGHT, CHR_PRINCESS, CHR_ZOMBIE, CHR_DRAGON, CHR_MEDKIT, CHR_WITCH, CHR_NOTHING, CHR_WALL, '+', '&'};
+    if (change.find(key) != change.end()){
+        change_char(map, pos, max_x, max_y, (char)key);
     }
     render(map, max_x, max_y, pos);
 }
